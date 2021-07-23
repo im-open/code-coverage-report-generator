@@ -1,19 +1,18 @@
-name: 'ReportGenerator'
-author: 'danielpalme'
+name: 'code-coverage-report-generator'
 description: 'Creates coverage reports from tools like OpenCover, dotCover, Visual Studio, NCover, Cobertura, JaCoCo, Clover, gcov or lcov'
 inputs:
   reports:
     description: 'The coverage reports that should be parsed (separated by semicolon). Globbing is supported.'
     required: true
-    default: 'coverage.xml'
+    default: '*/**/coverage.opencover.xml'
   targetdir:
     description: 'The directory where the generated report should be saved.'
     required: true
-    default: 'coveragereport'
+    default: 'coverage-results'
   reporttypes:
     description: 'The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary'
     required: false
-    default: 'HtmlInline;Cobertura'
+    default: 'Html;MarkdownSummary'
   sourcedirs:
     description: 'Optional directories which contain the corresponding source code (separated by semicolon). The source directories are used if coverage report contains classes without path information.'
     required: false
@@ -62,5 +61,5 @@ runs:
   using: 'node12'
   main: 'dist/index.js'
 branding:
-  icon: 'bar-chart-2'  
+  icon: 'bar-chart-2'
   color: 'green'

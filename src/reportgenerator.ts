@@ -33,7 +33,7 @@ async function run() {
       core.info("    dotnet-version: '5.0.301'");
       return;
     }
-    
+
     core.info("Detected .NET Core SDK version '" + output + "'");
 
     if (fs.existsSync(toolpath)) {
@@ -43,7 +43,7 @@ async function run() {
 
       output = '';
       resultCode = 0;
-  
+
       try {
         resultCode = await exec.exec(
           'dotnet',
@@ -60,10 +60,10 @@ async function run() {
         core.setFailed("Failed to install ReportGenerator global tool");
         return;
       }
-  
+
       core.info("Successfully installed ReportGenerator global tool");
     }
-    
+
 
     core.info("Executing ReportGenerator");
 
@@ -89,9 +89,9 @@ async function run() {
       const customSettings = (core.getInput('customSettings') || '');
 
       if (customSettings.length > 0) {
-          customSettings.split(';').forEach(setting => {
-              args.push(setting.trim());
-          });
+        customSettings.split(';').forEach(setting => {
+          args.push(setting.trim());
+        });
       }
 
       resultCode = await exec.exec(

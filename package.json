@@ -1,10 +1,18 @@
 {
-  "name": "ReportGenerator",
+  "name": "code-coverage-report-generator",
   "version": "4.8.12",
   "description": "",
   "main": "lib/reportgenerator.js",
   "scripts": {
-    "build": "tsc && ncc build"
+    "build": "npm ci && tsc && ncc build",
+    "format": "prettier --write **/*.js",
+    "format-check": "prettier --check **/*.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run build && npm run format",
+      "pre-push": "npm run format-check"
+    }
   },
   "keywords": [
     "code-coverage",
@@ -13,15 +21,17 @@
     "reporting",
     "dotnet-core"
   ],
-  "author": "danielpalme",
+  "author": "wtw",
   "license": "Apache-2.0",
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4"
   },
   "devDependencies": {
+    "@types/node": "^14.11.2",
     "@zeit/ncc": "^0.22.3",
-    "typescript": "^4.0.3",
-    "@types/node": "^14.11.2"
+    "husky": "^7.0.1",
+    "prettier": "^2.3.2",
+    "typescript": "^4.0.3"
   }
 }
