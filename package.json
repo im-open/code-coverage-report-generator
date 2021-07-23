@@ -4,7 +4,7 @@
   "description": "",
   "main": "lib/reportgenerator.js",
   "scripts": {
-    "build": "tsc && ncc build",
+    "build": "npm ci && tsc && ncc build",
     "format": "prettier --write **/*.js",
     "format-check": "prettier --check **/*.js"
   },
