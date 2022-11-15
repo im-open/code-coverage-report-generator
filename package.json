@@ -4,15 +4,9 @@
   "description": "",
   "main": "lib/reportgenerator.js",
   "scripts": {
-    "build": "npm ci && tsc && ncc build",
+    "build": "npm ci && tsc && ncc build && npm run format",
     "format": "prettier --write **/*.js",
     "format-check": "prettier --check **/*.js"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run build && npm run format",
-      "pre-push": "npm run format-check"
-    }
   },
   "keywords": [
     "code-coverage",
@@ -30,7 +24,6 @@
   "devDependencies": {
     "@types/node": "^14.11.2",
     "@zeit/ncc": "^0.22.3",
-    "husky": "^7.0.1",
     "prettier": "^2.3.2",
     "typescript": "^4.0.3"
   }
