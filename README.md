@@ -47,7 +47,8 @@ This action does not generate the code coverage reports itself, those must be cr
   run: dotnet test ${{ env.SOLUTION }} --no-restore --logger trx --configuration Release /property:CollectCoverage=True /property:CoverletOutputFormat=opencover
 
 - name: ReportGenerator
-  uses: im-open/code-coverage-report-generator@4.9.0
+  # You may also reference the major or major.minor version
+  uses: im-open/code-coverage-report-generator@4.9.2
   with:
     reports: '*/**/coverage.opencover.xml'
     targetdir: ${{ env.CODE_COVERAGE_DIR }}'
@@ -71,7 +72,7 @@ This action does not generate the code coverage reports itself, those must be cr
     path: ${{ env.CODE_COVERAGE_DIR }}
 
 - name: Create a PR comment from the summary file
-  uses: im-open/process-code-coverage-summary@v2.2.0
+  uses: im-open/process-code-coverage-summary@v2
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     summary-file: '${{ env.CODE_COVERAGE_DIR }}/Summary.md'
