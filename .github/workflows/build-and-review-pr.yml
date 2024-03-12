@@ -172,7 +172,7 @@ jobs:
         with:
           reports: '${{ env.REPORTS_INPUT_BAD_DIR }}'
           targetdir: '${{ env.TARGETDIR_INPUT_DOES_NOT_EXIST }}'
-          reporttypes: 'BarkdownSummary'
+          reporttypes: 'MarkdownSummary'
           verbosity: 'Info'
 
       - name: 3b - Then the action outcome should be failure
@@ -200,7 +200,7 @@ jobs:
         with:
           reports: '${{ env.REPORTS_INPUT_BAD_PATTERN }}'
           targetdir: '${{ env.TARGETDIR_INPUT_BAD_PATTERN }}'
-          reporttypes: 'BarkdownSummary'
+          reporttypes: 'MarkdownSummary'
           verbosity: 'Info'
 
       - name: 4b - Then the action outcome should be failure
@@ -254,7 +254,7 @@ jobs:
 
           actualFile="${{ env.ACTUAL_CONTENTS_MATCHING }}"
           expectedContentsFile="${{ env.EXPECTED_CONTENTS_MATCHING }}"
-          ./test/assert-file-contains-expected-content --fileName $actualFile --expectedContents $expectedContentsFile
+          ./test/assert-file-contains-expected-content.sh --fileName $actualFile --expectedContents $expectedContentsFile
 
       - name: '-------------------------------------------------------------------------------------------------------------'
         run: echo ""
@@ -295,7 +295,7 @@ jobs:
 
           actualFile="${{ env.ACTUAL_CONTENTS_ASSEMBLY_FILTERS }}"
           expectedContentsFile="${{ env.EXPECTED_CONTENTS_ASSEMBLY_FILTERS }}"
-          ./test/assert-file-contains-expected-content --fileName $actualFile --expectedContents $expectedContentsFile
+          ./test/assert-file-contains-expected-content.sh --fileName $actualFile --expectedContents $expectedContentsFile
 
       - name: '-------------------------------------------------------------------------------------------------------------'
         run: echo ""
@@ -335,7 +335,7 @@ jobs:
 
           actualFile="${{ env.ACTUAL_CONTENTS_CLASS_FILTERS }}"
           expectedContentsFile="${{ env.EXPECTED_CONTENTS_CLASS_FILTERS }}"
-          ./test/assert-file-contains-expected-content --fileName $actualFile --expectedContents $expectedContentsFile
+          ./test/assert-file-contains-expected-content.sh --fileName $actualFile --expectedContents $expectedContentsFile
 
       - name: '-------------------------------------------------------------------------------------------------------------'
         run: echo ""
@@ -375,4 +375,4 @@ jobs:
 
           actualFile="${{ env.ACTUAL_CONTENTS_FILE_FILTERS }}"
           expectedContentsFile="${{ env.EXPECTED_CONTENTS_FILE_FILTERS }}"
-          ./test/assert-file-contains-expected-content --fileName $actualFile --expectedContents $expectedContentsFile
+          ./test/assert-file-contains-expected-content.sh --fileName $actualFile --expectedContents $expectedContentsFile
