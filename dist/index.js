@@ -3381,7 +3381,7 @@ var require_exec = __commonJS({
 var core = require_core();
 var exec = require_exec();
 var fs = require('fs');
-var reportGeneratorVersion = '5.2.2';
+var reportGeneratorVersion = '4.8.12';
 async function run() {
   try {
     const verbosity = core.getInput('verbosity').trim();

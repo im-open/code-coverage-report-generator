@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const exec = require('@actions/exec');
 const fs = require('fs');
 
-const reportGeneratorVersion = '5.2.2';
+const reportGeneratorVersion = '4.8.12';
 
 async function run() {
   try {

@@ -89,6 +89,7 @@ This action does not generate the code coverage reports itself, those must be cr
 ### 4.9.2 to v5.0.0
 
 - The `toolpath` input was removed since it was underutilized.  `v5` and above will check for the presence of the tool in the `./reportgeneratortool` directory, which was the default location in prior versions.  If that directory does not exist, the tool will be installed with `v4.8.12`.  If desired, a different version of the global tool can be installed in this location prior to this action but different versions of the report generator tool may or may not be compatible with this action's code.
+  - The `4.8.12` version of the tool is older but will continue to be used to preserve metrics in the generated reports that newer versions no longer produce.
 - The following inputs were not utilized and have been removed completely from the action starting with `v5`.
   - `sourcedirs`
   - `historydir`
