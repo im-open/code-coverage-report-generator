@@ -1,10 +1,11 @@
 {
   "name": "code-coverage-report-generator",
-  "version": "4.8.12",
+  "version": "5.0.0",
   "description": "",
-  "main": "lib/reportgenerator.js",
+  "main": "index.js",
   "scripts": {
-    "build": "npm ci && tsc && ncc build && npm run format",
+    "build": "npm ci && esbuild ./src/reportgenerator.js --bundle --platform=node --outfile=dist/index.js && npm run format && git add dist/*",
+    "bundle": "esbuild ./src/reportgenerator.js --bundle --platform=node --outfile=dist/index.js",
     "format": "prettier --write **/*.js",
     "format-check": "prettier --check **/*.js"
   },
@@ -22,9 +23,8 @@
     "@actions/exec": "^1.0.4"
   },
   "devDependencies": {
-    "@types/node": "^14.11.2",
-    "@zeit/ncc": "^0.22.3",
-    "prettier": "^2.3.2",
-    "typescript": "^4.0.3"
+    "esbuild": "^0.20.1",
+    "install": "^0.13.0",
+    "prettier": "^2.3.2"
   }
 }

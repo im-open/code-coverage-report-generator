@@ -1,35 +1,31 @@
-import * as core from '@actions/core';
-import * as exec from '@actions/exec';
-import * as fs from 'fs';
+const core = require('@actions/core');
+const exec = require('@actions/exec');
+const fs = require('fs');
 
 const VERSION = '4.8.12';
 
 async function run() {
   try {
-    core.info("Detecting .NET Core SDK");
+    core.info('Detecting .NET Core SDK');
 
     let output = '';
     let resultCode = 0;
     let toolpath = core.getInput('toolpath');
 
     try {
-      resultCode = await exec.exec(
-        'dotnet',
-        ['--version'],
-        {
-          listeners: {
-            stdout: (data: Buffer) => {
-              output += data.toString();
-            }
+      resultCode = await exec.exec('dotnet', ['--version'], {
+        listeners: {
+          stdout: data => {
+            output += data.toString();
           }
         }
-      );
+      });
     } catch (error) {
-      core.setFailed(".NET Core SDK is not available.");
-      core.info("Please install with the following command in your YAML file:");
-      core.info("- name: Setup .NET Core");
-      core.info("  uses: actions/setup-dotnet@v1");
-      core.info("  with");
+      core.setFailed('.NET Core SDK is not available.');
+      core.info('Please install with the following command in your YAML file:');
+      core.info('- name: Setup .NET Core');
+      core.info('  uses: actions/setup-dotnet@v1');
+      core.info('  with');
       core.info("    dotnet-version: '5.0.301'");
       return;
     }
@@ -37,9 +33,9 @@ async function run() {
     core.info("Detected .NET Core SDK version '" + output + "'");
 
     if (fs.existsSync(toolpath)) {
-      core.info("ReportGenerator global tool already installed");
+      core.info('ReportGenerator global tool already installed');
     } else {
-      core.info("Installing ReportGenerator global tool (https://www.nuget.org/packages/dotnet-reportgenerator-globaltool)");
+      core.info('Installing ReportGenerator global tool (https://www.nuget.org/packages/dotnet-reportgenerator-globaltool)');
 
       output = '';
       resultCode = 0;
@@ -47,25 +43,33 @@ async function run() {
       try {
         resultCode = await exec.exec(
           'dotnet',
-          ['tool', 'install', 'dotnet-reportgenerator-globaltool', '--tool-path', toolpath, '--version', VERSION, '--ignore-failed-sources'],
+          [
+            'tool',
+            'install',
+            'dotnet-reportgenerator-globaltool',
+            '--tool-path',
+            toolpath,
+            '--version',
+            VERSION,
+            '--ignore-failed-sources'
+          ],
           {
             listeners: {
-              stdout: (data: Buffer) => {
+              stdout: data => {
                 output += data.toString();
               }
             }
           }
         );
       } catch (error) {
-        core.setFailed("Failed to install ReportGenerator global tool");
+        core.setFailed('Failed to install ReportGenerator global tool');
         return;
       }
 
-      core.info("Successfully installed ReportGenerator global tool");
+      core.info('Successfully installed ReportGenerator global tool');
     }
 
-
-    core.info("Executing ReportGenerator");
+    core.info('Executing ReportGenerator');
 
     output = '';
     resultCode = 0;
@@ -86,7 +90,7 @@ async function run() {
         '-tag:' + (core.getInput('tag') || '')
       ];
 
-      const customSettings = (core.getInput('customSettings') || '');
+      const customSettings = core.getInput('customSettings') || '';
 
       if (customSettings.length > 0) {
         customSettings.split(';').forEach(setting => {
@@ -94,23 +98,19 @@ async function run() {
         });
       }
 
-      resultCode = await exec.exec(
-        toolpath + '/reportgenerator',
-        args,
-        {
-          listeners: {
-            stdout: (data: Buffer) => {
-              output += data.toString();
-            }
+      resultCode = await exec.exec(toolpath + '/reportgenerator', args, {
+        listeners: {
+          stdout: data => {
+            output += data.toString();
           }
         }
-      );
+      });
     } catch (error) {
-      core.setFailed("Failed to execute ReportGenerator global tool");
+      core.setFailed('Failed to execute ReportGenerator global tool');
       return;
     }
 
-    core.info("Successfully executed ReportGenerator");
+    core.info('Successfully executed ReportGenerator');
   } catch (error) {
     core.setFailed(error.message);
   }

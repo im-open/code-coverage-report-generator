@@ -3,4 +3,3 @@ lib/
 node_modules
 /.vscode/launch.json
 reportgeneratortool
-src/*.js
