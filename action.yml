@@ -42,7 +42,7 @@ outputs:
   error-reason:
     description: 'If there are failures, a brief description of the error.'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 
 branding:
