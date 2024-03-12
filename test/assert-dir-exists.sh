@@ -17,7 +17,8 @@ echo "
 Asserting '$dir' exists"
 
 if [ -d "$dir" ]; then
-  echo "The target directory exists, which is expected."
+  echo "The target directory exists, which is expected.  It contains:"
+  ls -r $dir
 else 
   echo "The target directory does not exist but it should."
   exit 1

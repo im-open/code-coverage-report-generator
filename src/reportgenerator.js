@@ -15,8 +15,9 @@ async function run() {
     let output = '';
     const toolPath = 'reportgeneratortool';
 
-    core.info('Detecting .NET Core SDK...');
+    core.info('\nDetecting .NET Core SDK...');
     try {
+      core.startGroup('dotnet version output');
       await exec.exec('dotnet', ['--version'], {
         listeners: {
           stdout: data => {
@@ -24,8 +25,10 @@ async function run() {
           }
         }
       });
-      core.info(`Detected .NET Core SDK version '${output}'`);
+      core.endGroup();
+      core.info(`Detected .NET Core SDK version '${output.trim()}'`);
     } catch (error) {
+      core.endGroup();
       const shortMsg = 'dotnet not available';
       core.setOutput('error-reason', shortMsg);
       core.setFailed(shortMsg);
@@ -37,14 +40,15 @@ async function run() {
       return;
     }
 
-    core.info('Installing ReportGenerator global tool...');
-    core.info('https://www.nuget.org/packages/dotnet-reportgenerator-globaltool');
+    core.info('\nChecking for ReportGenerator global tool...');
     if (fs.existsSync(toolPath)) {
       core.info('ReportGenerator global tool already installed');
     } else {
       output = '';
 
       try {
+        core.startGroup('Installing ReportGenerator global tool');
+        core.info('https://www.nuget.org/packages/dotnet-reportgenerator-globaltool');
         await exec.exec(
           'dotnet',
           [
@@ -65,14 +69,16 @@ async function run() {
             }
           }
         );
+        core.endGroup();
         core.info('Successfully installed ReportGenerator global tool');
       } catch (error) {
+        core.endGroup();
         core.setFailed('Failed to install ReportGenerator global tool');
         return;
       }
     }
 
-    core.info('Executing ReportGenerator');
+    core.info('\nExecuting ReportGenerator global tool');
     try {
       let args = [
         `-reports:${core.getInput('reports')}`,
@@ -85,7 +91,7 @@ async function run() {
         `-title:${core.getInput('title')}`,
         `-tag:${core.getInput('tag')}`
       ];
-
+      core.startGroup('reportgenerator output');
       await exec.exec(`${toolPath}/reportgenerator`, args, {
         listeners: {
           stdout: data => {
@@ -93,8 +99,10 @@ async function run() {
           }
         }
       });
+      core.endGroup();
       core.info('Successfully executed ReportGenerator');
     } catch (error) {
+      core.endGroup();
       if (output.includes('No matching files found.')) {
         const shortMsg = 'No matching files found';
         core.setOutput('error-reason', shortMsg);

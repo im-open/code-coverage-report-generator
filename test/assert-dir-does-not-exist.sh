@@ -18,6 +18,7 @@ Asserting '$dir' does not exist"
 
 if [ -d "$dir" ]; then
   echo "The target directory exists when it should not."
+  ls -r $dir
   exit 1
 else 
   echo "The target directory does not exist, which is expected."

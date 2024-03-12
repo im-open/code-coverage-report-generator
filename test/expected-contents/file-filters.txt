@@ -13,4 +13,4 @@ MyProj
 MyProj.Core                    90.9%
   MyProj.Core.EnumExtensions   90.9%
 
-MyProj.Tests.Shared                 
+MyProj.Tests.Shared
