@@ -3381,48 +3381,53 @@ var require_exec = __commonJS({
 var core = require_core();
 var exec = require_exec();
 var fs = require('fs');
-var VERSION = '4.8.12';
+var reportGeneratorVersion = '4.8.12';
 async function run() {
   try {
-    core.info('Detecting .NET Core SDK');
+    const verbosity = core.getInput('verbosity').trim();
+    if (!isVerbosityValid(verbosity)) return;
+    const reportTypes = core.getInput('reporttypes').replace(/\s/g, '');
+    if (!areReportTypesValid(reportTypes)) return;
     let output = '';
-    let resultCode = 0;
-    let toolpath = core.getInput('toolpath');
+    const toolPath = 'reportgeneratortool';
+    core.info('Detecting .NET Core SDK...');
     try {
-      resultCode = await exec.exec('dotnet', ['--version'], {
+      await exec.exec('dotnet', ['--version'], {
         listeners: {
           stdout: data => {
             output += data.toString();
           }
         }
       });
+      core.info(`Detected .NET Core SDK version '${output}'`);
     } catch (error) {
-      core.setFailed('.NET Core SDK is not available.');
+      const shortMsg = 'dotnet not available';
+      core.setOutput('error-reason', shortMsg);
+      core.setFailed(shortMsg);
       core.info('Please install with the following command in your YAML file:');
       core.info('- name: Setup .NET Core');
       core.info('  uses: actions/setup-dotnet@v1');
       core.info('  with');
-      core.info("    dotnet-version: '5.0.301'");
+      core.info("    dotnet-version: '8.x' # 5.0 or higher");
       return;
     }
-    core.info("Detected .NET Core SDK version '" + output + "'");
-    if (fs.existsSync(toolpath)) {
+    core.info('Installing ReportGenerator global tool...');
+    core.info('https://www.nuget.org/packages/dotnet-reportgenerator-globaltool');
+    if (fs.existsSync(toolPath)) {
       core.info('ReportGenerator global tool already installed');
     } else {
-      core.info('Installing ReportGenerator global tool (https://www.nuget.org/packages/dotnet-reportgenerator-globaltool)');
       output = '';
-      resultCode = 0;
       try {
-        resultCode = await exec.exec(
+        await exec.exec(
           'dotnet',
           [
             'tool',
             'install',
             'dotnet-reportgenerator-globaltool',
             '--tool-path',
-            toolpath,
+            toolPath,
             '--version',
-            VERSION,
+            reportGeneratorVersion,
             '--ignore-failed-sources'
           ],
           {
@@ -3433,50 +3438,103 @@ async function run() {
             }
           }
         );
+        core.info('Successfully installed ReportGenerator global tool');
       } catch (error) {
         core.setFailed('Failed to install ReportGenerator global tool');
         return;
       }
-      core.info('Successfully installed ReportGenerator global tool');
     }
     core.info('Executing ReportGenerator');
-    output = '';
-    resultCode = 0;
     try {
       let args = [
-        '-reports:' + (core.getInput('reports') || ''),
-        '-targetdir:' + (core.getInput('targetdir') || ''),
-        '-reporttypes:' + (core.getInput('reporttypes') || ''),
-        '-sourcedirs:' + (core.getInput('sourcedirs') || ''),
-        '-historydir:' + (core.getInput('historydir') || ''),
-        '-plugins:' + (core.getInput('plugins') || ''),
-        '-assemblyfilters:' + (core.getInput('assemblyfilters') || ''),
-        '-classfilters:' + (core.getInput('classfilters') || ''),
-        '-filefilters:' + (core.getInput('filefilters') || ''),
-        '-verbosity:' + (core.getInput('verbosity') || ''),
-        '-title:' + (core.getInput('title') || ''),
-        '-tag:' + (core.getInput('tag') || '')
+        `-reports:${core.getInput('reports')}`,
+        `-targetdir:${core.getInput('targetdir')}`,
+        `-reporttypes:${reportTypes}`,
+        `-assemblyfilters:${core.getInput('assemblyfilters')}`,
+        `-classfilters:${core.getInput('classfilters')}`,
+        `-filefilters:${core.getInput('filefilters')}`,
+        `-verbosity:${verbosity}`,
+        `-title:${core.getInput('title')}`,
+        `-tag:${core.getInput('tag')}`
       ];
-      const customSettings = core.getInput('customSettings') || '';
-      if (customSettings.length > 0) {
-        customSettings.split(';').forEach(setting => {
-          args.push(setting.trim());
-        });
-      }
-      resultCode = await exec.exec(toolpath + '/reportgenerator', args, {
+      await exec.exec(`${toolPath}/reportgenerator`, args, {
         listeners: {
           stdout: data => {
             output += data.toString();
           }
         }
       });
+      core.info('Successfully executed ReportGenerator');
     } catch (error) {
-      core.setFailed('Failed to execute ReportGenerator global tool');
+      if (output.includes('No matching files found.')) {
+        const shortMsg = 'No matching files found';
+        core.setOutput('error-reason', shortMsg);
+        core.setFailed(`${shortMsg}. Verify reports input matches the coverage files to be processed by this action.`);
+      } else {
+        const shortMsg = 'Failed to execute ReportGenerator.exe';
+        core.setOutput('error-reason', shortMsg);
+        core.setFailed(`${shortMsg}: ${error.message}`);
+      }
       return;
     }
-    core.info('Successfully executed ReportGenerator');
   } catch (error) {
-    core.setFailed(error.message);
+    const shortMsg = 'Failed to execute the action';
+    core.setOutput('error-reason', shortMsg);
+    core.setFailed(`${shortMsg}: ${error.message}`);
   }
 }
 run();
+function areReportTypesValid(reportTypes) {
+  const allowedValues = [
+    'badges',
+    'cobertura',
+    'clover',
+    'csvsummary',
+    'html',
+    'htmlchart',
+    'htmlinline',
+    'htmlinline_azurepipelines',
+    'htmlinline_azurepipelines_dark',
+    'htmlsummary',
+    'jsonsummary',
+    'latex',
+    'latexsummary',
+    'markdownsummary',
+    'lcov',
+    'mhtml',
+    'pngchart',
+    'sonarqube',
+    'teamcitysummary',
+    'textsummary',
+    'xml',
+    'xmlsummary'
+  ];
+  const reportTypesArray = reportTypes.split(';');
+  let reportTypesAreValid = true;
+  for (const reportType of reportTypesArray) {
+    if (!reportType || reportType.trim().length === 0) continue;
+    const valueToCheck = reportType.trim().toLowerCase();
+    if (!allowedValues.includes(valueToCheck)) {
+      const shortMsg = 'Invalid report type';
+      core.setOutput('error-reason', shortMsg);
+      core.setFailed(`${shortMsg}: ${reportType}`);
+      reportTypesAreValid = false;
+    }
+  }
+  if (!reportTypesAreValid) {
+    core.info(`Allowed report type values: ${allowedValues.join(', ')}`);
+  }
+  return reportTypesAreValid;
+}
+function isVerbosityValid(verbosity) {
+  const valueToCheck = verbosity ? verbosity.trim().toLowerCase() : '';
+  const allowedValues = ['error', 'warning', 'info', 'verbose', 'off'];
+  if (!allowedValues.includes(valueToCheck)) {
+    const shortMsg = 'Invalid verbosity';
+    core.setOutput('error-reason', shortMsg);
+    core.setFailed(`${shortMsg}: ${verbosity}`);
+    core.info(`Allowed verbosity values: ${allowedValues.join(', ')}`);
+    return false;
+  }
+  return true;
+}

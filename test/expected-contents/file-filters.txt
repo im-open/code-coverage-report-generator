@@ -1,0 +1,16 @@
+﻿  Parser: OpenCoverParser
+  Assemblies: 3
+  Classes: 1
+  Files: 1
+  Line coverage: 90.9%
+  Covered lines: 10
+  Uncovered lines: 1
+  Coverable lines: 11
+  Total lines: 0
+
+MyProj                              
+
+MyProj.Core                    90.9%
+  MyProj.Core.EnumExtensions   90.9%
+
+MyProj.Tests.Shared                 

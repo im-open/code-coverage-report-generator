@@ -10,25 +10,9 @@ inputs:
     required: true
     default: 'coverage-results'
   reporttypes:
-    description: 'The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary'
+    description: 'The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MarkdownSummary, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary'
     required: false
     default: 'Html;MarkdownSummary'
-  sourcedirs:
-    description: 'Optional directories which contain the corresponding source code (separated by semicolon). The source directories are used if coverage report contains classes without path information.'
-    required: false
-    default: ''
-  historydir:
-    description: 'Optional directory for storing persistent coverage information. Can be used in future reports to show coverage evolution.'
-    required: false
-    default: ''
-  toolpath:
-    description: 'Default directory for installing the dotnet tool.'
-    required: false
-    default: 'reportgeneratortool'
-  plugins:
-    description: 'Optional plugin files for custom reports or custom history storage (separated by semicolon).'
-    required: false
-    default: ''
   assemblyfilters:
     description: 'Optional list of assemblies that should be included or excluded in the report. Exclusion filters take precedence over inclusion filters. Wildcards are allowed.'
     required: false
@@ -53,13 +37,14 @@ inputs:
     description: 'Optional tag or build version.'
     required: false
     default: '${{ github.run_number }}_${{ github.run_id }}'
-  customSettings:
-    description: 'Optional custom settings (separated by semicolon). See: https://github.com/danielpalme/ReportGenerator/wiki/Settings'
-    required: false
-    default: ''
+  
+outputs:
+  error-reason:
+    description: 'If there are failures, a brief description of the error.'
 runs:
   using: 'node16'
   main: 'dist/index.js'
+
 branding:
   icon: 'bar-chart-2'
   color: 'green'
