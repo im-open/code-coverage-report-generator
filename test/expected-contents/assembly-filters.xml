@@ -1,0 +1,29 @@
+    <Parser>OpenCoverParser</Parser>
+    <Assemblies>2</Assemblies>
+    <Classes>7</Classes>
+    <Files>7</Files>
+    <Coveredlines>141</Coveredlines>
+    <Uncoveredlines>16</Uncoveredlines>
+    <Coverablelines>157</Coverablelines>
+    <Totallines>0</Totallines>
+    <Linecoverage>89.8</Linecoverage>
+    <Coveredbranches>26</Coveredbranches>
+    <Totalbranches>32</Totalbranches>
+    <Branchcoverage>81.2</Branchcoverage>
+    <Title>MyProj Code Coverage AssemblyFilter</Title>
+    <Tag>assembly-filter-tag</Tag>
+  </Summary>
+  <Coverage>
+    <Assembly name="MyProj" classes="4" coverage="100" coveredlines="111" coverablelines="111" totallines="0" branchcoverage="100" coveredbranches="22" totalbranches="22">
+      <Class name="MyProj.Features.Notes.NotesController" coverage="100" coveredlines="48" coverablelines="48" totallines="0" branchcoverage="100" coveredbranches="10" totalbranches="10" />
+      <Class name="MyProj.Features.Reports.ReportsController" coverage="100" coveredlines="31" coverablelines="31" totallines="0" branchcoverage="100" coveredbranches="6" totalbranches="6" />
+      <Class name="MyProj.Features.Steps.StepsController" coverage="100" coveredlines="27" coverablelines="27" totallines="0" branchcoverage="100" coveredbranches="6" totalbranches="6" />
+      <Class name="MyProj.Features.Steps.StepsVm" coverage="100" coveredlines="5" coverablelines="5" totallines="0" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+    <Assembly name="MyProj.Core" classes="3" coverage="65.2" coveredlines="30" coverablelines="46" totallines="0" branchcoverage="40" coveredbranches="4" totalbranches="10">
+      <Class name="MyProj.Core.Container" coverage="44.4" coveredlines="12" coverablelines="27" totallines="0" branchcoverage="33.3" coveredbranches="2" totalbranches="6" />
+      <Class name="MyProj.Core.EnumExtensions" coverage="90.9" coveredlines="10" coverablelines="11" totallines="0" branchcoverage="50" coveredbranches="2" totalbranches="4" />
+      <Class name="MyProj.Core.Grade" coverage="100" coveredlines="8" coverablelines="8" totallines="0" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+  </Coverage>
+</CoverageReport>

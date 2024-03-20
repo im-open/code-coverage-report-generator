@@ -1,0 +1,23 @@
+﻿parser": "OpenCoverParser",
+    "assemblies": 3,
+    "classes": 4,
+    "files": 4,
+    "coveredlines": 111,
+    "uncoveredlines": 0,
+    "coverablelines": 111,
+    "totallines": 0,
+    "linecoverage": 100,
+    "coveredbranches": 22,
+    "totalbranches": 22,
+    "branchcoverage": 100 },
+  "coverage": {
+    "assemblies": [
+      { "name": "MyProj", "classes": 4, "coverage": 100, "coveredlines": 111, "coverablelines": 111, "totallines": 0, "branchcoverage": 100, "coveredbranches": 22, "totalbranches": 22, "classesinassembly": [
+        { "name": "MyProj.Features.Notes.NotesController", "coverage": 100, "coveredlines": 48, "coverablelines": 48, "totallines": 0, "branchcoverage": 100, "coveredbranches": 10, "totalbranches": 10 },
+        { "name": "MyProj.Features.Reports.ReportsController", "coverage": 100, "coveredlines": 31, "coverablelines": 31, "totallines": 0, "branchcoverage": 100, "coveredbranches": 6, "totalbranches": 6 },
+        { "name": "MyProj.Features.Steps.StepsController", "coverage": 100, "coveredlines": 27, "coverablelines": 27, "totallines": 0, "branchcoverage": 100, "coveredbranches": 6, "totalbranches": 6 },
+        { "name": "MyProj.Features.Steps.StepsVm", "coverage": 100, "coveredlines": 5, "coverablelines": 5, "totallines": 0, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0 } ] },
+      { "name": "MyProj.Core", "classes": 0, "coverage": null, "coveredlines": 0, "coverablelines": 0, "totallines": 0, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "classesinassembly": [
+ ] },
+      { "name": "MyProj.Tests.Shared", "classes": 0, "coverage": null, "coveredlines": 0, "coverablelines": 0, "totallines": 0, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "classesinassembly": [
+ ] } ]

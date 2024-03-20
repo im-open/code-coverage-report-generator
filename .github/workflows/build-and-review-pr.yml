@@ -60,3 +60,427 @@ jobs:
       # The npm script to run to build the action.  This is typically 'npm run build' if the
       # action needs to be compiled.  For composite-run-steps actions this is typically empty.
       build-command: 'npm run build'
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    env:
+      # These env vars are reused and set for each test scenario
+      REPORTS_INPUT: '' 
+      TARGETDIR_INPUT: '' 
+      ERROR_REASON: '' 
+      GENERATED_FILE: '' 
+      FILE_WITH_SUBSTRING: '' 
+      
+    steps:
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                                    SETUP                                                    '
+        run: echo ""
+
+      - name: Setup - Checkout the action
+        uses: actions/checkout@v4
+
+      - name: Setup - Create the test-results directory
+        run: mkdir -p ./test-results
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                      TEST 1 - INVALID VERBOSITY INPUT                                       '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 1
+        if: always()
+        run: |
+          errorReason="Invalid verbosity"
+          reports="./test/input-files/valid/*.xml"
+          targetDir="./test-results/invalid-verbosity"
+          generatedFile=""
+          fileWithSubstring=""
+
+          echo "ERROR_REASON=$errorReason" >> "$GITHUB_ENV"
+          echo "REPORTS_INPUT=$reports" >> "$GITHUB_ENV"
+          echo "TARGETDIR_INPUT=$targetDir" >> "$GITHUB_ENV"
+          echo "GENERATED_FILE=$generatedFile" >> "$GITHUB_ENV"
+          echo "FILE_WITH_SUBSTRING=$fileWithSubstring" >> "$GITHUB_ENV"
+
+      - name: 1a - When code-coverage-report-generator is called with an invalid 'verbosity' input
+        id: invalid-verbosity
+        if: always()
+        continue-on-error: true # This is needed because we expect the step to fail but we need it to "pass" in order for the test job to succeed.
+        uses: ./
+        with:
+          reports: '${{ env.REPORTS_INPUT }}'
+          targetdir: '${{ env.TARGETDIR_INPUT }}'
+          reporttypes: 'MarkdownSummary'
+          verbosity: 'InVaLId_VeRbOsItY'
+
+      - name: 1b - Then the action outcome should be failure
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "failure" --actual "${{ steps.invalid-verbosity.outcome }}"
+
+      - name: 1c - And the 'error-reason' output should be '${{ env.ERROR_REASON }}'
+        if: always()
+        run: ./test/assert-values-match.sh --name "error-reason output" --expected "${{ env.ERROR_REASON }}" --actual "${{ steps.invalid-verbosity.outputs.error-reason }}"
+
+      - name: 1d - And the target directory should not exist
+        if: always()
+        run: ./test/assert-dir-does-not-exist.sh --dir "${{ env.TARGETDIR_INPUT }}"
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                      TEST 2 - INVALID REPORTTYPES INPUT                                     '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 2
+        if: always()
+        run: |
+          errorReason="Invalid report type"
+          reports="./test/input-files/valid/*.xml"
+          targetDir="./test-results/invalid-reporttypes"
+          generatedFile=""
+          fileWithSubstring=""
+
+          echo "ERROR_REASON=$errorReason" >> "$GITHUB_ENV"
+          echo "REPORTS_INPUT=$reports" >> "$GITHUB_ENV"
+          echo "TARGETDIR_INPUT=$targetDir" >> "$GITHUB_ENV"
+          echo "GENERATED_FILE=$generatedFile" >> "$GITHUB_ENV"
+          echo "FILE_WITH_SUBSTRING=$fileWithSubstring" >> "$GITHUB_ENV"
+
+      - name: 2a - When code-coverage-report-generator is called with an invalid 'reporttypes' input
+        id: invalid-reporttypes
+        if: always()
+        continue-on-error: true # This is needed because we expect the step to fail but we need it to "pass" in order for the test job to succeed.
+        uses: ./
+        with:
+          reports: '${{ env.REPORTS_INPUT }}'
+          targetdir: '${{ env.TARGETDIR_INPUT }}'
+          reporttypes: 'BarkdownSummary'
+          verbosity: 'Info'
+
+      - name: 2b - Then the action outcome should be failure
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "failure" --actual "${{ steps.invalid-reporttypes.outcome }}"
+
+      - name: 2c - And the 'error-reason' output should be '${{ env.ERROR_REASON }}'
+        if: always()
+        run: ./test/assert-values-match.sh --name "error-reason output" --expected "${{ env.ERROR_REASON }}" --actual "${{ steps.invalid-reporttypes.outputs.error-reason }}"
+
+      - name: 2d - And the target directory should not exist
+        if: always()
+        run: ./test/assert-dir-does-not-exist.sh --dir "${{ env.TARGETDIR_INPUT }}"
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                               TEST 3 - BAD REPORTS INPUT (DIR DOES NOT EXIST)                               '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 3
+        if: always()
+        run: |
+          errorReason="No matching files found"
+          reports="./test/input-files/bad-dir/*.xml"
+          targetDir="./test-results/dir-does-not-exist"
+          generatedFile=""
+          fileWithSubstring=""
+
+          echo "ERROR_REASON=$errorReason" >> "$GITHUB_ENV"
+          echo "REPORTS_INPUT=$reports" >> "$GITHUB_ENV"
+          echo "TARGETDIR_INPUT=$targetDir" >> "$GITHUB_ENV"
+          echo "GENERATED_FILE=$generatedFile" >> "$GITHUB_ENV"
+          echo "FILE_WITH_SUBSTRING=$fileWithSubstring" >> "$GITHUB_ENV"
+
+      - name: 3a - When code-coverage-report-generator is called with a 'reports' input dir that does not exist
+        id: dir-does-not-exist
+        if: always()
+        continue-on-error: true # This is needed because we expect the step to fail but we need it to "pass" in order for the test job to succeed.
+        uses: ./
+        with:
+          reports: '${{ env.REPORTS_INPUT }}'
+          targetdir: '${{ env.TARGETDIR_INPUT }}'
+          reporttypes: 'MarkdownSummary'
+          verbosity: 'Info'
+
+      - name: 3b - Then the action outcome should be failure
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "failure" --actual "${{ steps.dir-does-not-exist.outcome }}"
+
+      - name: 3c - And the 'error-reason' output should be '${{ env.ERROR_REASON }}'
+        if: always()
+        run: ./test/assert-values-match.sh --name "error-reason output" --expected "${{ env.ERROR_REASON }}" --actual "${{ steps.dir-does-not-exist.outputs.error-reason }}"
+
+      - name: 3d - And the target directory should be empty
+        if: always()
+        run: ./test/assert-dir-is-empty.sh --dir "${{ env.TARGETDIR_INPUT }}"
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                        TEST 4 - BAD REPORTS INPUT (PATTERN DOES NOT MATCH ANY FILES)                        '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 4
+        if: always()
+        run: |
+          errorReason="No matching files found"
+          reports="./test/input-files/valid/*.opncvr.xml"
+          targetDir="./test-results/bad-pattern"
+          generatedFile=""
+          fileWithSubstring=""
+
+          echo "ERROR_REASON=$errorReason" >> "$GITHUB_ENV"
+          echo "REPORTS_INPUT=$reports" >> "$GITHUB_ENV"
+          echo "TARGETDIR_INPUT=$targetDir" >> "$GITHUB_ENV"
+          echo "GENERATED_FILE=$generatedFile" >> "$GITHUB_ENV"
+          echo "FILE_WITH_SUBSTRING=$fileWithSubstring" >> "$GITHUB_ENV"
+
+      - name: 4a - When code-coverage-report-generator is called with a 'reports' input pattern that does not match any files
+        id: bad-pattern
+        if: always()
+        continue-on-error: true # This is needed because we expect the step to fail but we need it to "pass" in order for the test job to succeed.
+        uses: ./
+        with:
+          reports: '${{ env.REPORTS_INPUT }}'
+          targetdir: '${{ env.TARGETDIR_INPUT }}'
+          reporttypes: 'MarkdownSummary'
+          verbosity: 'Info'
+
+      - name: 4b - Then the action outcome should be failure
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "failure" --actual "${{ steps.bad-pattern.outcome }}"
+
+      - name: 4c - And the 'error-reason' output should be '${{ env.ERROR_REASON }}'
+        if: always()
+        run: ./test/assert-values-match.sh --name "error-reason output" --expected "${{ env.ERROR_REASON }}" --actual "${{ steps.bad-pattern.outputs.error-reason }}"
+
+      - name: 4d - And the target directory should be empty
+        if: always()
+        run: ./test/assert-dir-is-empty.sh --dir "${{ env.TARGETDIR_INPUT }}"
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                          TEST 5 - MATCHING REPORTS                                          '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 5
+        if: always()
+        run: |
+          errorReason=""
+          reports="./test/input-files/valid/*.xml"
+          targetDir="./test-results/matching-reports"
+          generatedFile="$targetDir/Summary.md"
+          fileWithSubstring="./test/expected-contents/matching-reports.md"
+
+          echo "ERROR_REASON=$errorReason" >> "$GITHUB_ENV"
+          echo "REPORTS_INPUT=$reports" >> "$GITHUB_ENV"
+          echo "TARGETDIR_INPUT=$targetDir" >> "$GITHUB_ENV"
+          echo "GENERATED_FILE=$generatedFile" >> "$GITHUB_ENV"
+          echo "FILE_WITH_SUBSTRING=$fileWithSubstring" >> "$GITHUB_ENV"
+
+      - name: 5a - When code-coverage-report-generator is called with a 'reports' input pattern that matches files
+        id: matching-reports
+        if: always()
+        uses: ./
+        with:
+          reports: '${{ env.REPORTS_INPUT }}'
+          targetdir: '${{ env.TARGETDIR_INPUT}}'
+          reporttypes: ' MarkDoWNSummary;Html '
+          verbosity: ' InFo '
+          title: 'MyProj Code Coverage'
+          tag: 'matching-tag'
+
+      - name: 5b - Then the action outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.matching-reports.outcome }}"
+
+      - name: 5c - And the 'error-reason' output should be empty
+        if: always()
+        run: ./test/assert-value-is-empty.sh --name "error-reason output" --value "${{ steps.matching-reports.outputs.error-reason }}"
+
+      - name: 5d - And the target directory should exist
+        if: always()
+        run: ./test/assert-dir-exists.sh --dir "${{ env.TARGETDIR_INPUT }}"
+
+      - name: 5e - And '${{ env.GENERATED_FILE }}' should contain the expected substring
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Comparing the Summary.md file will ensure that:
+            //  - The provided tag is included
+            //  - The title is not included (reporttype=MarkDoWNSummary does not support it)
+            //  - None of the assemblies/classes/files have been filtered out because those inputs were not supplied
+
+            const fs = require('fs');
+            const assertFileContainsSubstring = require('./test/assert-file-contains-substring.js');
+            assertFileContainsSubstring(core, fs, '${{ env.GENERATED_FILE }}', '${{ env.FILE_WITH_SUBSTRING }}');
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                          TEST 6 - ASSEMBLY FILTERS                                          '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 6
+        if: always()
+        run: |
+          errorReason=""
+          reports="./test/input-files/valid/*.xml"
+          targetDir="./test-results/assembly-filters"
+          generatedFile="$targetDir/Summary.xml"
+          fileWithSubstring="./test/expected-contents/assembly-filters.xml"
+
+          echo "ERROR_REASON=$errorReason" >> "$GITHUB_ENV"
+          echo "REPORTS_INPUT=$reports" >> "$GITHUB_ENV"
+          echo "TARGETDIR_INPUT=$targetDir" >> "$GITHUB_ENV"
+          echo "GENERATED_FILE=$generatedFile" >> "$GITHUB_ENV"
+          echo "FILE_WITH_SUBSTRING=$fileWithSubstring" >> "$GITHUB_ENV"
+
+      - name: 6a - When code-coverage-report-generator is called with assembly filters
+        id: assembly-filters
+        if: always()
+        uses: ./
+        with:
+          reports: '${{ env.REPORTS_INPUT }}'
+          targetdir: '${{ env.TARGETDIR_INPUT }}'
+          reporttypes: 'XmlSummary'
+          title: 'MyProj Code Coverage AssemblyFilter'
+          assemblyfilters: '+MyProj*;-MyProj.Tests.*'
+          tag: 'assembly-filter-tag'
+
+      - name: 6b - Then the action outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.assembly-filters.outcome }}"
+
+      - name: 6c - And the 'error-reason' output should be empty
+        if: always()
+        run: ./test/assert-value-is-empty.sh --name "error-reason output" --value "${{ steps.assembly-filters.outputs.error-reason }}"
+
+      - name: 6d - And the target directory should exist
+        if: always()
+        run: ./test/assert-dir-exists.sh --dir "${{ env.TARGETDIR_INPUT }}"
+
+      - name: 6e - And '${{ env.GENERATED_FILE }}' should contain the expected substring
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Comparing the Summary.xml file will ensure that:
+            //  - The tag is included (reporttype=XmlSummary supports it)
+            //  - The title is included (reporttype=XmlSummary supports it)
+            //  - The assemblies have been filtered
+
+            const fs = require('fs');
+            const assertFileContainsSubstring = require('./test/assert-file-contains-substring.js');
+            assertFileContainsSubstring(core, fs, '${{ env.GENERATED_FILE }}', '${{ env.FILE_WITH_SUBSTRING }}');
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                             TEST 7 - CLASS FILTERS                                          '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 7
+        if: always()
+        run: |
+          errorReason=""
+          reports="./test/input-files/valid/*.xml"
+          targetDir="./test-results/class-filters"
+          generatedFile="$targetDir/Summary.json"
+          fileWithSubstring="./test/expected-contents/class-filters.json"
+
+          echo "ERROR_REASON=$errorReason" >> "$GITHUB_ENV"
+          echo "REPORTS_INPUT=$reports" >> "$GITHUB_ENV"
+          echo "TARGETDIR_INPUT=$targetDir" >> "$GITHUB_ENV"
+          echo "GENERATED_FILE=$generatedFile" >> "$GITHUB_ENV"
+          echo "FILE_WITH_SUBSTRING=$fileWithSubstring" >> "$GITHUB_ENV"
+
+      - name: 7a - When code-coverage-report-generator is called with class filters
+        id: class-filters
+        if: always()
+        uses: ./
+        with:
+          reports: '${{ env.REPORTS_INPUT }}'
+          targetdir: '${{ env.TARGETDIR_INPUT }}'
+          reporttypes: 'JsonSummary'
+          classfilters: '-MyProj.Tests.*;-MyProj.Core*'
+          tag: 'class-filter-tag'
+
+      - name: 7b - Then the action outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.class-filters.outcome }}"
+
+      - name: 7c - And the 'error-reason' output should be empty
+        if: always()
+        run: ./test/assert-value-is-empty.sh --name "error-reason output" --value "${{ steps.class-filters.outputs.error-reason }}"
+
+      - name: 7d - And the target directory should exist
+        if: always()
+        run: ./test/assert-dir-exists.sh --dir "${{ env.TARGETDIR_INPUT }}"
+
+      - name: 7e - And '${{ env.GENERATED_FILE }}' should contain the expected substring
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Comparing the Summary.json file will ensure that:
+            //  - No tag is included (reporttype=JsonSummary does not support it)
+            //  - No title is included (the input was not supplied)
+            //  - The classes have been filtered
+
+            const fs = require('fs');
+            const assertFileContainsSubstring = require('./test/assert-file-contains-substring.js');
+            assertFileContainsSubstring(core, fs, '${{ env.GENERATED_FILE }}', '${{ env.FILE_WITH_SUBSTRING }}');
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                              TEST 8 - FILE FILTERS                                          '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 8
+        if: always()
+        run: |
+          errorReason=""
+          reports="./test/input-files/valid/*.xml"
+          targetDir="./test-results/file-filters"
+          generatedFile="$targetDir/Summary.txt"
+          fileWithSubstring="./test/expected-contents/file-filters.txt"
+
+          echo "ERROR_REASON=$errorReason" >> "$GITHUB_ENV"
+          echo "REPORTS_INPUT=$reports" >> "$GITHUB_ENV"
+          echo "TARGETDIR_INPUT=$targetDir" >> "$GITHUB_ENV"
+          echo "GENERATED_FILE=$generatedFile" >> "$GITHUB_ENV"
+          echo "FILE_WITH_SUBSTRING=$fileWithSubstring" >> "$GITHUB_ENV"
+
+      - name: 8a - When code-coverage-report-generator is called with file filters
+        id: file-filters
+        if: always()
+        uses: ./
+        with:
+          reports: '${{ env.REPORTS_INPUT }}'
+          targetdir: '${{ env.TARGETDIR_INPUT }}'
+          reporttypes: 'TextSummary'
+          filefilters: '+*EnumExtensions.cs'
+          tag: 'file-filter-tag'
+
+      - name: 8b - Then the action outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.file-filters.outcome }}"
+
+      - name: 8c - And the 'error-reason' output should be empty
+        if: always()
+        run: ./test/assert-value-is-empty.sh --name "error-reason output" --value "${{ steps.file-filters.outputs.error-reason }}"
+
+      - name: 8d - And the target directory should exist
+        if: always()
+        run: ./test/assert-dir-exists.sh --dir "${{ env.TARGETDIR_INPUT }}"
+
+      - name: 8e - And '${{ env.GENERATED_FILE }}' should contain the expected substring
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Comparing the Summary.txt file will ensure that:
+            //  - No tag is included (reporttype=TextSummary does not support it)
+            //  - No title is included (the input was not supplied)
+            //  - The files have been filtered
+
+            const fs = require('fs');
+            const assertFileContainsSubstring = require('./test/assert-file-contains-substring.js');
+            assertFileContainsSubstring(core, fs, '${{ env.GENERATED_FILE }}', '${{ env.FILE_WITH_SUBSTRING }}');
