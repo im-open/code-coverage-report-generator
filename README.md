@@ -56,7 +56,7 @@ This action does not generate the code coverage reports itself, those must be cr
 
 - name: ReportGenerator
   # You may also reference the major or major.minor version
-  uses: im-open/code-coverage-report-generator@v5.0.0
+  uses: im-open/code-coverage-report-generator@v5.0.1
   with:
     reports: '*/**/coverage.opencover.xml'
     targetdir: ${{ env.CODE_COVERAGE_DIR }}'
